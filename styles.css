@@ -184,6 +184,8 @@ tr:hover {
 }
 
 /* Dogs Page Styles */
+
+/* Carousel container */
 .dog-carousel {
     width: 100%;
     max-width: 600px;
@@ -194,19 +196,26 @@ tr:hover {
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.dog-slide {
-    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 400px;
-    object-fit: contain;
-    display: none;
 }
 
+/* Individual slides */
+.dog-slide {
+    display: none;
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Show active slide */
 .dog-slide.active {
     display: block;
 }
 
+/* Breed buttons container */
 .breed-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -215,6 +224,7 @@ tr:hover {
     margin: 2rem 0;
 }
 
+/* Each breed button */
 .breed-btn {
     padding: 0.5rem 1rem;
     background-color: #4CAF50;
@@ -229,6 +239,7 @@ tr:hover {
     background-color: #45a049;
 }
 
+/* Breed information display */
 .breed-info {
     background-color: white;
     padding: 1rem;

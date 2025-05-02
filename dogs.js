@@ -1,106 +1,62 @@
-document.addEventListener('DOMContentLoaded', function () {
+// 1) Random images carousel
+fetch('https://dog.ceo/api/breeds/image/random/10')
+  .then(r => r.json())
+  .then(data => {
     const slider = document.getElementById('dog-slider');
-    const breedButtonsContainer = document.getElementById('breed-buttons');
-    const breedInfoContainer = document.getElementById('breed-info');
-    let currentSlide = 0;
-    let dogImages = [];
-    let breedsData = {};
+    slider.classList.add('dog-carousel');
+    data.message.forEach((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'dog-slide' + (i === 0 ? ' active' : '');
+      slider.appendChild(img);
+    });
 
-    // Fetch random dog images using Dog CEO API
-    async function fetchDogImages() {
-        try {
-            const responses = await Promise.all(
-                Array.from({ length: 10 }, () => fetch('https://dog.ceo/api/breeds/image/random'))
-            );
-            const data = await Promise.all(responses.map(res => res.json()));
-            dogImages = data.map(item => item.message);
+    // Simple manual slider (as backup if Slider lib fails or you want a minimal version)
+    let current = 0;
+    setInterval(() => {
+      const slides = document.querySelectorAll('.dog-slide');
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 3000);
+  });
 
-            // Display images in slider
-            slider.innerHTML = '';
-            dogImages.forEach((img, index) => {
-                const imgElement = document.createElement('img');
-                imgElement.src = img;
-                imgElement.alt = 'Random dog';
-                imgElement.className = 'dog-slide';
-                if (index === 0) imgElement.classList.add('active');
-                slider.appendChild(imgElement);
-            });
+// 2) Load breeds list
+fetch('https://dog.ceo/api/breeds/list/all')
+  .then(r => r.json())
+  .then(data => {
+    const container = document.getElementById('breed-buttons');
+    container.classList.add('breed-buttons');
+    Object.keys(data.message).forEach(breed => {
+      const btn = document.createElement('button');
+      btn.textContent = breed;
+      btn.className = 'breed-btn';
+      btn.setAttribute('data-breed', breed);
+      btn.onclick = () => loadBreedInfo(breed);
+      container.appendChild(btn);
+    });
+  });
 
-            setInterval(rotateSlides, 3000);
-        } catch (error) {
-            console.error('Error fetching dog images:', error);
-        }
-    }
-
-    // Rotate slides
-    function rotateSlides() {
-        const slides = document.querySelectorAll('.dog-slide');
-        if (slides.length === 0) return;
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
-    }
-
-    // Fetch dog breeds using Dog API by kinduff
-    async function fetchDogBreeds() {
-        try {
-            const response = await fetch('https://corsproxy.io/?https://dogapi.dog/api/v2/breeds');
-            const data = await response.json();
-    
-            console.log('Breed data:', data); // Log to see what's coming back
-    
-            if (!Array.isArray(data)) {
-                console.error('Expected an array of breeds, got:', data);
-                return;
-            }
-    
-            breedsData = {};
-            breedButtonsContainer.innerHTML = '';
-    
-            data.forEach(breed => {
-                const breedName = breed.name;
-                const breedKey = breedName.toLowerCase().replace(/\s+/g, '');
-    
-                breedsData[breedKey] = {
-                    name: breedName,
-                    description: breed.description || 'No description available',
-                    minLife: breed.life_span?.split(' - ')[0] || 'Unknown',
-                    maxLife: breed.life_span?.split(' - ')[1] || 'Unknown'
-                };
-    
-                const button = document.createElement('button');
-                button.className = 'breed-btn';
-                button.textContent = breedName;
-                button.addEventListener('click', () => displayBreedInfo(breedName));
-                breedButtonsContainer.appendChild(button);
-            });
-    
-        } catch (error) {
-            console.error('Error fetching dog breeds:', error);
-        }
-    }
-    
-    
-
-    // Display breed information
-    function displayBreedInfo(breed) {
-        const breedKey = breed.toLowerCase().replace(/\s+/g, '');
-        const breedInfo = breedsData[breedKey];
-
-        if (breedInfo) {
-            document.getElementById('breed-name').textContent = breedInfo.name;
-            document.getElementById('breed-description').textContent = breedInfo.description;
-            document.getElementById('breed-life').textContent = `${breedInfo.minLife} - ${breedInfo.maxLife} years`;
-            breedInfoContainer.style.display = 'block';
-        } else {
-            document.getElementById('breed-name').textContent = breed;
-            document.getElementById('breed-description').textContent = 'Information not available for this breed.';
-            document.getElementById('breed-life').textContent = 'Unknown';
-            breedInfoContainer.style.display = 'block';
-        }
-    }
-
-    // Initial load
-    fetchDogImages();
-    fetchDogBreeds();
-});
+// 3) On‑demand breed info
+function loadBreedInfo(breed) {
+  fetch(`https://api.thedogapi.com/v1/breeds/search?q=${breed}`)
+    .then(r => r.json())
+    .then(arr => {
+      if (!arr.length) throw new Error();
+      const info = arr[0];
+      const [min, max] = info.life_span.replace(' years', '').split(' - ').map(n => n.trim());
+      const container = document.getElementById('breed-info');
+      container.className = 'breed-info';
+      container.innerHTML = `
+        <h2>${info.name}</h2>
+        <p><strong>Description:</strong> ${info.temperament || 'n/a'}</p>
+        <p><strong>Min Life:</strong> ${min}</p>
+        <p><strong>Max Life:</strong> ${max}</p>
+      `;
+    })
+    .catch(() => {
+      const container = document.getElementById('breed-info');
+      container.className = 'breed-info';
+      container.textContent = 'Could not load info.';
+    });
+}

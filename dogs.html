@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Activities - Dogs</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-slider/1.0.0/simpleslider.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
-    <script src="scripts.js" defer></script>
-    <script src="dogs.js" defer></script>
+  <meta charset="UTF-8">
+  <title>Dogs</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/simple-slider@latest/dist/slider.min.css">
 </head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="stocks.html">Stocks</a></li>
-            <li class="active"><a href="dogs.html">Dogs</a></li>
-        </ul>
-    </nav>
+<body id="dogs">
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="stocks.html">Stocks</a></li>
+      <li><a href="dogs.html" class="active">Dogs</a></li>
+    </ul>
+  </nav>
 
-    <main>
-        <h1>Dog Breeds Gallery</h1>
-        
-        <div class="dog-carousel" id="dog-slider">
-            <!-- Filled by JavaScript -->
-        </div>
-        
-        <div class="breed-buttons" id="breed-buttons">
-            <!-- Filled by JavaScript -->
-        </div>
-        
-        <div class="breed-info" id="breed-info" style="display: none;">
-            <h2 id="breed-name"></h2>
-            <p id="breed-description"></p>
-            <p>Life Span: <span id="breed-life"></span></p>
-        </div>
-    </main>
+  <!-- Main Content -->
+  <div class="container">
+    <h1>Random Dogs</h1>
 
-    <div class="audio-instructions">
-        <h3>Voice Commands</h3>
-        <p>Say "Hello" for a greeting</p>
-        <p>Say "Change the color to [color]" to change background</p>
-        <p>Say "Navigate to [page]" to go to another page</p>
-        <p>Say "Load Dog Breed [breed name]" to get breed info</p>
-        <button id="audio-on" class="audio-btn">Turn On Voice</button>
-        <button id="audio-off" class="audio-btn">Turn Off Voice</button>
-    </div>
+    <!-- Carousel -->
+    <div id="dog-slider"></div>
+
+    <h2>Breeds</h2>
+    <div id="breed-buttons"></div>
+
+    <!-- Breed Info -->
+    <div id="breed-info"></div>
+  </div>
+
+  <!-- Audio Controls -->
+  <div class="audio-instructions">
+    <h3>Voice Commands</h3>
+    <p>Say "Hello" for a greeting</p>
+    <p>Say "Change the color to [color]" to change background</p>
+    <p>Say "Navigate to [page]" to go to another page</p>
+    <p>Say "Load Dog Breed [breed name]" to get breed info</p>
+    <button id="audio-on" class="audio-btn">Turn On Voice</button>
+    <button id="audio-off" class="audio-btn">Turn Off Voice</button>
+</div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+  <script src="https://unpkg.com/simple-slider@latest/dist/slider.min.js"></script>
+  <script src="audio.js"></script>
+  <script src="dogs.js"></script>
 </body>
 </html>
