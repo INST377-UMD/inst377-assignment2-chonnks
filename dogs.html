@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Class Activities - Dogs</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/simple-slider@latest/dist/slider.min.css">
+</head>
+<body id="dogs">
+
+  <header>
+    <h1 style="text-align: center; padding: 1.5rem 0;">Bruce Reyes INST377 - Activities: Dogs</h1>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="stocks.html">Stocks</a></li>
+      <li><a href="dogs.html" class="active">Dogs</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h1>Random Dogs</h1>
+    <div id="dog-slider"></div>
+    <h2>Breeds</h2>
+    <div id="breed-buttons"></div>
+    <div id="breed-info"></div>
+  </div>
+
+  <!-- voice command -->
+  <div class="voice-command">
+    <h3>Voice Commands</h3>
+    <p>Say "Hello" for a greeting</p>
+    <p>Say "Change the color to [color]" to change background</p>
+    <p>Say "Navigate to [page]" to go to another page</p>
+    <p>Say "Load Dog Breed [breed name]" to get breed info</p>
+    <button id="audio-on" class="audio-buttons">Turn On Voice</button>
+    <button id="audio-off" class="audio-buttons">Turn Off Voice</button>
+</div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+  <script src="https://unpkg.com/simple-slider@latest/dist/slider.min.js"></script>
+  <script src="scripts.js"></script>
+  <script src="dogs.js"></script>
+</body>
+</html>
