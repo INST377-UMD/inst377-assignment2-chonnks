@@ -1,42 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Activities - Home</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
-    <script src="scripts.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Class Activities - Home</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+  <script src="scripts.js" defer></script>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li class="active"><a href="index.html">Home</a></li>
-            <li><a href="stocks.html">Stocks</a></li>
-            <li><a href="dogs.html">Dogs</a></li>
-        </ul>
-    </nav>
+  <header>
+    <h1 style="text-align: center; padding: 1.5rem 0;">Bruce Reyes INST377 - Activities</h1>
+  </header>
 
-    <main>
-        <h1>Welcome to Class Activities</h1>
-        <div class="quote-container">
-            <p id="daily-quote">Loading quote...</p>
-        </div>
-        
-        <div class="button-container">
-            <button class="custom-btn btn-1" onclick="window.location.href='stocks.html'">Stocks</button>
-            <button class="custom-btn btn-1" onclick="window.location.href='dogs.html'">Dogs</button>
-        </div>
-    </main>
+  <!-- nav bar -->
+  <nav>
+    <ul>
+      <li class="active"><a href="index.html">Home</a></li>
+      <li><a href="stocks.html">Stocks</a></li>
+      <li><a href="dogs.html">Dogs</a></li>
+    </ul>
+  </nav>
 
-    <div class="audio-instructions">
-        <h3>Voice Commands</h3>
-        <p>Say "Hello" for a greeting</p>
-        <p>Say "Change the color to [color]" to change background</p>
-        <p>Say "Navigate to [page]" to go to another page</p>
-        <button id="audio-on" class="audio-btn">Turn On Voice</button>
-        <button id="audio-off" class="audio-btn">Turn Off Voice</button>
+  <main>
+    <h2 style="text-align: center;">Activities</h2>
+    <div class="quote-container">
+      <p id="daily-quote">Loading quote...</p>
     </div>
+    
+    <div class="button-container">
+        <button class="custom-button" onclick="window.location.href='stocks.html'" role="button">Stocks</button>
+        <button class="custom-button" onclick="window.location.href='dogs.html'" role="button">Dogs</button>
+      </div>
+  </main>
+
+  <!-- voice command -->
+  <div class="voice-command">
+    <h3>Voice Commands</h3>
+    <p>Say "Hello" for a greeting</p>
+    <p>Say "Change the color to [color]" to change background</p>
+    <p>Say "Navigate to [page]" to go to another page</p>
+    <button id="audio-on" class="audio-buttons">Turn On Voice</button>
+    <button id="audio-off" class="audio-buttons">Turn Off Voice</button>
+  </div>
 </body>
 </html>

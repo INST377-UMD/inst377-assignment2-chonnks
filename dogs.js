@@ -1,17 +1,32 @@
-// 1) Random images carousel
+// random dog image generator
 fetch('https://dog.ceo/api/breeds/image/random/10')
-  .then(r => r.json())
+  .then(res => res.json())
   .then(data => {
-    const slider = document.getElementById('dog-slider');
-    slider.classList.add('dog-carousel');
-    data.message.forEach((src, i) => {
+    const carousel = document.getElementById('dog-slider');
+    const buttonContainer = document.getElementById('breed-buttons');
+
+    carousel.classList.add('dog-carousel');
+    buttonContainer.classList.add('breeds');
+
+    const breedsFound = new Set();
+
+    data.message.forEach((url, idx) => {
+      // Create and add image to carousel
       const img = document.createElement('img');
-      img.src = src;
-      img.className = 'dog-slide' + (i === 0 ? ' active' : '');
-      slider.appendChild(img);
+      img.src = url;
+      img.className = 'dog-slide' + (idx === 0 ? ' active' : '');
+      carousel.appendChild(img);
+
+      // Extract breed name from image URL
+      const parts = url.split('/');
+      const breedRaw = parts[parts.indexOf('breeds') + 1];
+      const nameParts = breedRaw.split('-').reverse();
+      const breedName = nameParts.join(' ');
+
+      breedsFound.add(breedName);
     });
 
-    // Simple manual slider (as backup if Slider lib fails or you want a minimal version)
+    // carousel functionality
     let current = 0;
     setInterval(() => {
       const slides = document.querySelectorAll('.dog-slide');
@@ -19,44 +34,46 @@ fetch('https://dog.ceo/api/breeds/image/random/10')
       current = (current + 1) % slides.length;
       slides[current].classList.add('active');
     }, 3000);
-  });
 
-// 2) Load breeds list
-fetch('https://dog.ceo/api/breeds/list/all')
-  .then(r => r.json())
-  .then(data => {
-    const container = document.getElementById('breed-buttons');
-    container.classList.add('breed-buttons');
-    Object.keys(data.message).forEach(breed => {
+    // buttons for each loaded breed
+    breedsFound.forEach(breed => {
       const btn = document.createElement('button');
       btn.textContent = breed;
-      btn.className = 'breed-btn';
+      btn.className = 'custom-button';
       btn.setAttribute('data-breed', breed);
-      btn.onclick = () => loadBreedInfo(breed);
-      container.appendChild(btn);
+      btn.setAttribute('role', 'button');
+      btn.onclick = () => loadBreedDetails(breed);
+      buttonContainer.appendChild(btn);
     });
   });
 
-// 3) On‑demand breed info
-function loadBreedInfo(breed) {
+// breed details
+function loadBreedDetails(breed) {
   fetch(`https://api.thedogapi.com/v1/breeds/search?q=${breed}`)
-    .then(r => r.json())
-    .then(arr => {
-      if (!arr.length) throw new Error();
-      const info = arr[0];
-      const [min, max] = info.life_span.replace(' years', '').split(' - ').map(n => n.trim());
-      const container = document.getElementById('breed-info');
-      container.className = 'breed-info';
-      container.innerHTML = `
+    .then(res => res.json())
+    .then(data => {
+      if (!data.length) throw new Error();
+
+      const info = data[0];
+      // Parse lifespan 
+      const [minLife, maxLife] = info.life_span.replace(' years', '').split(' - ').map(x => x.trim());
+
+      // Display info 
+      const infoBox = document.getElementById('breed-info');
+      infoBox.className = 'breed-info';
+      infoBox.innerHTML = `
         <h2>${info.name}</h2>
         <p><strong>Description:</strong> ${info.temperament || 'n/a'}</p>
-        <p><strong>Min Life:</strong> ${min}</p>
-        <p><strong>Max Life:</strong> ${max}</p>
+        <p><strong>Min Life:</strong> ${minLife}</p>
+        <p><strong>Max Life:</strong> ${maxLife}</p>
       `;
     })
     .catch(() => {
-      const container = document.getElementById('breed-info');
-      container.className = 'breed-info';
-      container.textContent = 'Could not load info.';
+      const infoBox = document.getElementById('breed-info');
+      infoBox.className = 'breed-info';
+      infoBox.textContent = 'Could not load info.';
     });
 }
+
+// voice command integration
+window.loadBreedDetails = loadBreedDetails;

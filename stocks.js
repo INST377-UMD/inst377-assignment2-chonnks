@@ -1,250 +1,173 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const apiKey = 'fSIOczbF_9undbou4fD1M_Y13Fy5cSEw'; 
-    let stockChart = null;
-    
-    // Initialize chart
-    const ctx = document.getElementById('stock-chart').getContext('2d');
-    stockChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Stock Price',
-                data: [],
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Price ($)'
-                    }
-                }
-            }
-        }
-    });
-    
-    // Fetch stock data with improved error handling
-    document.getElementById('fetch-stock').addEventListener('click', async function() {
-        const ticker = document.getElementById('stock-ticker').value.trim().toUpperCase();
-        const days = document.getElementById('time-range').value;
-        const fetchButton = document.getElementById('fetch-stock');
-        
-        if (!ticker) {
-            showError('Please enter a stock ticker');
-            return;
-        }
-        
-        try {
-            // Show loading state
-            fetchButton.disabled = true;
-            fetchButton.textContent = 'Loading...';
-            
-            const fromDate = new Date();
-            fromDate.setDate(fromDate.getDate() - days);
-            const toDate = new Date();
-            
-            const formattedFrom = formatDate(fromDate);
-            const formattedTo = formatDate(toDate);
-            
-            const response = await fetch(`https://api.polygon.io/v2/aggs/ticker/${ticker}/range/1/day/${formattedFrom}/${formattedTo}?apiKey=${apiKey}`);
-            
-            if (!response.ok) {
-                throw new Error(`API request failed with status ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (!data.results || data.resultsCount === 0) {
-                throw new Error('No data found for this ticker and date range');
-            }
-            
-            // Process data for chart
-            const dates = data.results.map(item => new Date(item.t).toLocaleDateString());
-            const closes = data.results.map(item => item.c);
-            
-            // Update chart
-            stockChart.data.labels = dates;
-            stockChart.data.datasets[0].data = closes;
-            stockChart.data.datasets[0].label = `${ticker} Stock Price`;
-            stockChart.update();
-            
-            // Clear any previous errors
-            clearError();
-            
-        } catch (error) {
-            console.error('Error fetching stock data:', error);
-            showError(`Error: ${error.message}. Please check the ticker symbol and try again.`);
-            
-            // Reset chart to empty state
-            stockChart.data.labels = [];
-            stockChart.data.datasets[0].data = [];
-            stockChart.update();
-        } finally {
-            // Restore button state
-            fetchButton.disabled = false;
-            fetchButton.textContent = 'Get Stock Data';
-        }
-    });
-    
-    // Helper function to format date as YYYY-MM-DD
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    
-    // Error display functions
-    function showError(message) {
-        clearError();
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
-        errorDiv.textContent = message;
-        document.querySelector('.stock-controls').appendChild(errorDiv);
-    }
-    
-    function clearError() {
-        const existingError = document.querySelector('.error-message');
-        if (existingError) {
-            existingError.remove();
-        }
-    }
-    
-    // Initial load
-// Updated fetchTopRedditStocks function with fallback
-async function fetchTopRedditStocks() {
-    try {
-        // First try the tradestie API
-        const response = await fetch('https://tradestie.com/api/v1/apps/reddit');
-        
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
-        
-        let data = await response.json();
-        
-        // If we get an empty array or wrong format, try alternative API
-        if (!Array.isArray(data) || data.length === 0) {
-            data = await fetchAlternativeRedditStocks();
-        }
-        
-        // Sort by comment count and take top 5
-        const top5 = data.sort((a, b) => (b.no_of_comments || 0) - (a.no_of_comments || 0)).slice(0, 5);
-        
-        updateStocksTable(top5);
-        
-    } catch (error) {
-        console.error('Error fetching Reddit stocks:', error);
-        try {
-            // Fallback to alternative API if first attempt fails
-            const fallbackData = await fetchAlternativeRedditStocks();
-            const top5 = fallbackData.slice(0, 5);
-            updateStocksTable(top5);
-        } catch (fallbackError) {
-            console.error('Fallback API also failed:', fallbackError);
-            showError('Could not load Reddit stocks data. Please try again later.');
-        }
-    }
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const apiKeyPolygon = "fSIOczbF_9undbou4fD1M_Y13Fy5cSEw";
+  const chartArea = document.querySelector("#stock-chart").getContext("2d");
 
-// Alternative Reddit stocks API
-// Updated fetchTopRedditStocks function with better debugging
-async function fetchTopRedditStocks() {
-    try {
-        // Using a more reliable API endpoint
-        const response = await fetch('https://apewisdom.io/api/v1.0/filter/wallstreetbets');
-        
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('API Response:', data); // Debugging
-        
-        if (!data.results || data.results.length === 0) {
-            throw new Error('No stocks data available');
-        }
-        
-        // Process and display top 5 stocks
-        processAndDisplayStocks(data.results);
-        
-    } catch (error) {
-        console.error('Error fetching Reddit stocks:', error);
-        showError('Could not load trending stocks. Showing sample data instead.');
-        displaySampleData();
+  // Initialize empty stock line chart
+  const chartInstance = new Chart(chartArea, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [{
+        label: "Stock Price",
+        data: [],
+        borderColor: "rgb(75, 192, 192)",
+        tension: 0.1,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: "Date" } },
+        y: { title: { display: true, text: "Price ($)" } }
+      }
     }
-}
+  });
 
-function processAndDisplayStocks(stocks) {
-    // Sort by mentions and get top 5
-    const top5 = stocks
-        .filter(stock => stock.ticker) // Ensure ticker exists
-        .sort((a, b) => b.mentions - a.mentions)
+  const fetchBtn = document.querySelector("#fetch-stock");
+
+  // Event listener to fetch stock data on button click
+  fetchBtn.addEventListener("click", async () => {
+    const inputSymbol = document.querySelector("#stock-ticker").value.trim().toUpperCase();
+    const dayRange = document.querySelector("#time-range").value;
+
+    if (!inputSymbol) {
+      displayError("Please enter a stock ticker");
+      return;
+    }
+
+    try {
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = "Loading...";
+
+      // Calculate date range
+      const today = new Date();
+      const pastDate = new Date();
+      pastDate.setDate(today.getDate() - dayRange);
+
+      const startDate = formatDateString(pastDate);
+      const endDate = formatDateString(today);
+
+      // Build Polygon.io API URL
+      const apiUrl = `https://api.polygon.io/v2/aggs/ticker/${inputSymbol}/range/1/day/${startDate}/${endDate}?apiKey=${apiKeyPolygon}`;
+
+      const apiResult = await fetch(apiUrl);
+      if (!apiResult.ok) throw new Error(`API request failed with status ${apiResult.status}`);
+
+      const jsonData = await apiResult.json();
+
+      if (!jsonData.results || jsonData.results.length === 0) {
+        throw new Error("No data found for this ticker");
+      }
+
+      // Extract labels and values
+      const dateLabels = jsonData.results.map(entry => new Date(entry.t).toLocaleDateString());
+      const closingPrices = jsonData.results.map(entry => entry.c);
+
+      // Update chart
+      chartInstance.data.labels = dateLabels;
+      chartInstance.data.datasets[0].data = closingPrices;
+      chartInstance.data.datasets[0].label = `${inputSymbol} Stock Price`;
+
+      chartInstance.update();
+      clearError();
+    } catch (fetchErr) {
+      console.error("Error:", fetchErr);
+      displayError(fetchErr.message);
+      chartInstance.data.labels = [];
+      chartInstance.data.datasets[0].data = [];
+      chartInstance.update();
+    } finally {
+      fetchBtn.disabled = false;
+      fetchBtn.textContent = "Get Stock Data";
+    }
+  });
+
+  // Format a date object to YYYY-MM-DD
+  function formatDateString(dateObj) {
+    const yyyy = dateObj.getFullYear();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const dd = String(dateObj.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Show error message below stock controls
+  function displayError(messageText) {
+    clearError();
+    const errorBox = document.createElement("div");
+    errorBox.className = "error-message";
+    errorBox.textContent = messageText;
+    document.querySelector(".stock-controls").appendChild(errorBox);
+  }
+
+  // Remove existing error message
+  function clearError() {
+    const existingError = document.querySelector(".error-message");
+    if (existingError) existingError.remove();
+  }
+
+  // Load and display top 5 Reddit stocks
+  async function getTopRedditMentions() {
+    try {
+      const redditFetch = await fetch("https://tradestie.com/api/v1/apps/reddit?date=2022-04-03");
+      if (!redditFetch.ok) throw new Error(`API failed with status ${redditFetch.status}`);
+
+      const redditData = await redditFetch.json();
+      const trendingStocks = redditData
+        .filter(item => item.ticker && item.no_of_comments && item.sentiment)
+        .sort((a, b) => b.no_of_comments - a.no_of_comments)
         .slice(0, 5);
-    
-    console.log('Top 5 Stocks:', top5); // Debugging
-    
-    const tableBody = document.querySelector('#reddit-stocks tbody');
-    tableBody.innerHTML = '';
-    
-    top5.forEach(stock => {
-        const row = document.createElement('tr');
-        
-        // Ticker with link
-        const tickerCell = document.createElement('td');
-        const tickerLink = document.createElement('a');
+
+      const table = document.querySelector("#reddit-stocks tbody");
+      table.innerHTML = "";
+
+      trendingStocks.forEach(stock => {
+        const tr = document.createElement("tr");
+
+        // Ticker column with link
+        const tdTicker = document.createElement("td");
+        const tickerLink = document.createElement("a");
         tickerLink.href = `https://finance.yahoo.com/quote/${stock.ticker}`;
         tickerLink.textContent = stock.ticker;
-        tickerLink.target = '_blank';
-        tickerCell.appendChild(tickerLink);
-        row.appendChild(tickerCell);
-        
-        // Number of mentions
-        const mentionsCell = document.createElement('td');
-        mentionsCell.textContent = stock.mentions || 'N/A';
-        row.appendChild(mentionsCell);
-        
-        // Sentiment with icon
-        const sentimentCell = document.createElement('td');
-        const sentimentIcon = document.createElement('span');
-        sentimentIcon.className = 'sentiment-icon';
-        
-        // Determine sentiment based on different possible API fields
-        const sentimentValue = stock.sentiment || 
-                             (stock.sentiment_score > 0 ? 'Bullish' : 'Bearish') || 
-                             'Unknown';
-        
-        if (sentimentValue.toLowerCase().includes('bull')) {
-            sentimentIcon.textContent = '🐂';
-            sentimentIcon.title = 'Bullish';
-        } else if (sentimentValue.toLowerCase().includes('bear')) {
-            sentimentIcon.textContent = '🐻';
-            sentimentIcon.title = 'Bearish';
-        } else {
-            sentimentIcon.textContent = '❓';
-            sentimentIcon.title = 'Unknown';
-        }
-        
-        sentimentCell.appendChild(sentimentIcon);
-        sentimentCell.appendChild(document.createTextNode(` ${sentimentValue}`));
-        row.appendChild(sentimentCell);
-        
-        tableBody.appendChild(row);
-    });
-}
+        tickerLink.target = "_blank";
+        tdTicker.appendChild(tickerLink);
+        tr.appendChild(tdTicker);
 
-// Call this when the page loads
-fetchTopRedditStocks();
+        // Comment count
+        const tdComments = document.createElement("td");
+        tdComments.textContent = stock.no_of_comments;
+        tr.appendChild(tdComments);
+
+        // Sentiment icon + label
+        const tdSentiment = document.createElement("td");
+        const sentimentIcon = document.createElement("span");
+        sentimentIcon.className = "sentiment-icon";
+
+        const sentimentType = stock.sentiment.toLowerCase();
+        if (sentimentType.includes("bull")) {
+          sentimentIcon.textContent = "🐂";
+          sentimentIcon.title = "Bullish";
+        } else if (sentimentType.includes("bear")) {
+          sentimentIcon.textContent = "🐻";
+          sentimentIcon.title = "Bearish";
+        } else {
+          sentimentIcon.textContent = "❓";
+          sentimentIcon.title = "Unknown";
+        }
+
+        tdSentiment.appendChild(sentimentIcon);
+        tdSentiment.append(` ${stock.sentiment}`);
+        tr.appendChild(tdSentiment);
+
+        table.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("Failed to load Reddit stocks:", err);
+      const table = document.querySelector("#reddit-stocks tbody");
+      table.innerHTML = "<tr><td colspan='3'>Failed to load data.</td></tr>";
+    }
+  }
+
+  // Load Reddit data on page load
+  getTopRedditMentions();
 });

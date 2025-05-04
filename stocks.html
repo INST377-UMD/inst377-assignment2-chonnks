@@ -1,66 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Activities - Stocks</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
-    <script src="scripts.js" defer></script>
-    <script src="stocks.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Class Activities - Stocks</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+  <script src="scripts.js" defer></script>
+  <script src="stocks.js" defer></script>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li class="active"><a href="stocks.html">Stocks</a></li>
-            <li><a href="dogs.html">Dogs</a></li>
-        </ul>
-    </nav>
+  <header>
+    <h1 style="text-align: center; padding: 1.5rem 0;">Bruce Reyes INST377 - Activities: Stocks</h1>
+  </header>
 
-    <main>
-        <h1>Stock Market Data</h1>
-        
-        <div class="stock-controls">
-            <input type="text" id="stock-ticker" placeholder="Enter stock ticker (e.g. AAPL)">
-            <select id="time-range">
-                <option value="30">30 Days</option>
-                <option value="60">60 Days</option>
-                <option value="90">90 Days</option>
-            </select>
-            <button id="fetch-stock" class="custom-btn btn-1">Get Stock Data</button>
-        </div>
-        
-        <div class="chart-container">
-            <canvas id="stock-chart"></canvas>
-        </div>
-        
-        <div class="top-stocks">
-            <h2>Top 5 Reddit Stocks</h2>
-            <table id="reddit-stocks">
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th>Comments</th>
-                        <th>Sentiment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Filled by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-    </main>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li class="active"><a href="stocks.html">Stocks</a></li>
+      <li><a href="dogs.html">Dogs</a></li>
+    </ul>
+  </nav>
 
-    <div class="audio-instructions">
-        <h3>Voice Commands</h3>
-        <p>Say "Hello" for a greeting</p>
-        <p>Say "Change the color to [color]" to change background</p>
-        <p>Say "Navigate to [page]" to go to another page</p>
-        <p>Say "Lookup [stock]" to search for a stock (e.g. "Lookup MSFT")</p>
-        <button id="audio-on" class="audio-btn">Turn On Voice</button>
-        <button id="audio-off" class="audio-btn">Turn Off Voice</button>
+  <main>
+    <h2 style="text-align: center;">Let's chart some stocks!</h2>
+
+    <div class="stock-controls">
+      <input type="text" id="stock-ticker" maxlength="5" placeholder="Enter stock ticker" />
+        <select id="time-range">
+          <option value="30">30 Days</option>
+          <option value="60">60 Days</option>
+          <option value="90">90 Days</option>
+        </select>
+        <button id="fetch-stock" class="custom-button" role="button">Get Stock Data</button>
     </div>
+
+    <div class="chart">
+      <canvas id="stock-chart"></canvas>
+    </div>
+
+    <div class="top-stocks">
+      <h2>Top 5 Reddit Stocks</h2>
+      <table id="reddit-stocks">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Comments</th>
+            <th>Sentiment</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- voice command -->
+  <div class="voice-command">
+    <h3>Voice Commands</h3>
+    <p>Say "Hello" for a greeting</p>
+    <p>Say "Change the color to [color]" to change background</p>
+    <p>Say "Navigate to [page]" to go to another page</p>
+    <p>Say "Lookup [stock]" to search for a stock (e.g. "Lookup MSFT")</p>
+    <button id="audio-on" class="audio-buttons">Turn On Voice</button>
+    <button id="audio-off" class="audio-buttons">Turn Off Voice</button>
+  </div>
 </body>
 </html>
